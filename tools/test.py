@@ -19,6 +19,8 @@ from engine.inference import inference
 from modeling import build_model
 from utils.logger import setup_logger
 
+import numpy as np
+import random
 
 def main():
     parser = argparse.ArgumentParser(description="ReID Baseline Inference")
@@ -54,7 +56,7 @@ def main():
 
     if cfg.MODEL.DEVICE == "cuda":
         os.environ['CUDA_VISIBLE_DEVICES'] = cfg.MODEL.DEVICE_ID
-    cudnn.benchmark = True
+    # cudnn.benchmark = True
 
     train_loader, val_loader, num_query, num_classes = make_data_loader(cfg)
     model = build_model(cfg, num_classes)
@@ -64,4 +66,11 @@ def main():
 
 
 if __name__ == '__main__':
+    manualSeed = 42
+
+    np.random.seed(manualSeed)
+    random.seed(manualSeed)
+    torch.manual_seed(manualSeed)
+    cudnn.deterministic = True
+    cudnn.benchmark = False
     main()

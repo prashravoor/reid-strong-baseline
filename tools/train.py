@@ -20,11 +20,12 @@ from layers import make_loss, make_loss_with_center
 from solver import make_optimizer, make_optimizer_with_center, WarmupMultiStepLR
 
 from utils.logger import setup_logger
+import random
+import numpy as np
 
-
-def train(cfg):
+def train(cfg, logger):
     # prepare dataset
-    train_loader, val_loader, num_query, num_classes = make_data_loader(cfg)
+    train_loader, val_loader, num_query, num_classes = make_data_loader(cfg, logger)
 
     # prepare model
     model = build_model(cfg, num_classes)
@@ -43,8 +44,8 @@ def train(cfg):
             print('Start epoch:', start_epoch)
             path_to_optimizer = cfg.MODEL.PRETRAIN_PATH.replace('model', 'optimizer')
             print('Path to the checkpoint of optimizer:', path_to_optimizer)
-            model.load_state_dict(torch.load(cfg.MODEL.PRETRAIN_PATH))
-            optimizer.load_state_dict(torch.load(path_to_optimizer))
+            model = torch.load(cfg.MODEL.PRETRAIN_PATH)
+            optimizer = torch.load(path_to_optimizer)
             scheduler = WarmupMultiStepLR(optimizer, cfg.SOLVER.STEPS, cfg.SOLVER.GAMMA, cfg.SOLVER.WARMUP_FACTOR,
                                           cfg.SOLVER.WARMUP_ITERS, cfg.SOLVER.WARMUP_METHOD, start_epoch)
         elif cfg.MODEL.PRETRAIN_CHOICE == 'imagenet':
@@ -86,10 +87,10 @@ def train(cfg):
             print('Path to the checkpoint of center_param:', path_to_center_param)
             path_to_optimizer_center = cfg.MODEL.PRETRAIN_PATH.replace('model', 'optimizer_center')
             print('Path to the checkpoint of optimizer_center:', path_to_optimizer_center)
-            model.load_state_dict(torch.load(cfg.MODEL.PRETRAIN_PATH))
-            optimizer.load_state_dict(torch.load(path_to_optimizer))
-            center_criterion.load_state_dict(torch.load(path_to_center_param))
-            optimizer_center.load_state_dict(torch.load(path_to_optimizer_center))
+            model = torch.load(cfg.MODEL.PRETRAIN_PATH)
+            optimizer = torch.load(path_to_optimizer)
+            center_criterion = torch.load(path_to_center_param)
+            optimizer_center = torch.load(path_to_optimizer_center)
             scheduler = WarmupMultiStepLR(optimizer, cfg.SOLVER.STEPS, cfg.SOLVER.GAMMA, cfg.SOLVER.WARMUP_FACTOR,
                                           cfg.SOLVER.WARMUP_ITERS, cfg.SOLVER.WARMUP_METHOD, start_epoch)
         elif cfg.MODEL.PRETRAIN_CHOICE == 'imagenet':
@@ -146,13 +147,21 @@ def main():
         with open(args.config_file, 'r') as cf:
             config_str = "\n" + cf.read()
             logger.info(config_str)
-    logger.info("Running with config:\n{}".format(cfg))
+    # logger.info("Running with config:\n{}".format(cfg))
 
     if cfg.MODEL.DEVICE == "cuda":
         os.environ['CUDA_VISIBLE_DEVICES'] = cfg.MODEL.DEVICE_ID    # new add by gu
-    cudnn.benchmark = True
-    train(cfg)
+    # cudnn.benchmark = True
+    train(cfg, logger)
 
 
 if __name__ == '__main__':
+    manualSeed = 42
+
+    np.random.seed(manualSeed)
+    random.seed(manualSeed)
+    torch.manual_seed(manualSeed)
+    cudnn.deterministic = True
+    cudnn.benchmark = False
+    
     main()

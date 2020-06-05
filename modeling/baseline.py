@@ -10,6 +10,7 @@ from torch import nn
 from .backbones.resnet import ResNet, BasicBlock, Bottleneck
 from .backbones.senet import SENet, SEResNetBottleneck, SEBottleneck, SEResNeXtBottleneck
 from .backbones.resnet_ibn_a import resnet50_ibn_a
+import torchvision.models as models
 
 
 def weights_init_kaiming(m):
@@ -40,6 +41,7 @@ class Baseline(nn.Module):
 
     def __init__(self, num_classes, last_stride, model_path, neck, neck_feat, model_name, pretrain_choice):
         super(Baseline, self).__init__()
+        self.model_name = model_name
         if model_name == 'resnet18':
             self.in_planes = 512
             self.base = ResNet(last_stride=last_stride, 
@@ -127,8 +129,11 @@ class Baseline(nn.Module):
                               last_stride=last_stride)
         elif model_name == 'resnet50_ibn_a':
             self.base = resnet50_ibn_a(last_stride)
+        elif model_name == 'densenet':
+            self.base = models.densenet201(pretrained=True)
+            self.base.classifier = nn.Sequential(nn.Dropout(0.5), nn.Linear(1920, self.in_planes))
 
-        if pretrain_choice == 'imagenet':
+        if pretrain_choice == 'imagenet' and not 'densenet' == model_name:
             self.base.load_param(model_path)
             print('Loading pretrained ImageNet model......')
 
@@ -152,7 +157,11 @@ class Baseline(nn.Module):
 
     def forward(self, x):
 
-        global_feat = self.gap(self.base(x))  # (b, 2048, 1, 1)
+        # Fix differences in shape of final layer output
+        if not self.model_name == 'densenet':
+            global_feat = self.gap(self.base(x))  # (b, 2048, 1, 1)
+        else:
+            global_feat = self.base(x)
         global_feat = global_feat.view(global_feat.shape[0], -1)  # flatten to (bs, 2048)
 
         if self.neck == 'no':
@@ -173,7 +182,7 @@ class Baseline(nn.Module):
 
     def load_param(self, trained_path):
         param_dict = torch.load(trained_path)
-        for i in param_dict:
-            if 'classifier' in i:
+        for k, v in param_dict.state_dict().items():
+            if 'classifier' in k:
                 continue
-            self.state_dict()[i].copy_(param_dict[i])
+            self.state_dict()[k].copy_(param_dict.state_dict()[k])

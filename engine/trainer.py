@@ -13,6 +13,7 @@ from ignite.handlers import ModelCheckpoint, Timer
 from ignite.metrics import RunningAverage
 
 from utils.reid_metric import R1_mAP
+import os
 
 global ITER
 ITER = 0
@@ -202,7 +203,7 @@ def do_train(
             cmc, mAP = evaluator.state.metrics['r1_mAP']
             logger.info("Validation Results - Epoch: {}".format(engine.state.epoch))
             logger.info("mAP: {:.1%}".format(mAP))
-            for r in [1, 5, 10]:
+            for r in [1, 5, 10, 20]:
                 logger.info("CMC curve, Rank-{:<3}:{:.1%}".format(r, cmc[r - 1]))
 
     trainer.run(train_loader, max_epochs=epochs)
@@ -284,7 +285,21 @@ def do_train_with_center(
             cmc, mAP = evaluator.state.metrics['r1_mAP']
             logger.info("Validation Results - Epoch: {}".format(engine.state.epoch))
             logger.info("mAP: {:.1%}".format(mAP))
-            for r in [1, 5, 10]:
+            cmcs = []
+            ranks = [1, 3, 5, 10, 20, 50]
+            for r in ranks:
                 logger.info("CMC curve, Rank-{:<3}:{:.1%}".format(r, cmc[r - 1]))
+                cmcs.append(cmc[r-1])
+
+            # Write out epoch results to a file. Very useful for quickly checking the accuracy
+            filename = os.path.join(output_dir, '{}.txt'.format(output_dir))
+            if not os.path.exists(filename):
+                with open(filename, 'w') as f:
+                    f.write(','.join(['Epoch', 'mAP'] + [str(x) for x in ranks]))
+                    f.write('\n')
+
+            with open(filename, 'a') as f:
+                res = '{},{},{}\n'.format(engine.state.epoch, mAP, ','.join([str(x) for x in cmcs]))
+                f.write(res)
 
     trainer.run(train_loader, max_epochs=epochs)

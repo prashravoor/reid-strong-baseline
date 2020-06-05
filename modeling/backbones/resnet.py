@@ -98,9 +98,11 @@ class ResNet(nn.Module):
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
         self.layer1 = self._make_layer(block, 64, layers[0])
         self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
+        self.dropout1 = nn.Dropout(0.25)
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
         self.layer4 = self._make_layer(
             block, 512, layers[3], stride=last_stride)
+        self.dropout2 = nn.Dropout(0.5)
 
     def _make_layer(self, block, planes, blocks, stride=1):
         downsample = None
@@ -127,8 +129,10 @@ class ResNet(nn.Module):
 
         x = self.layer1(x)
         x = self.layer2(x)
+        x = self.dropout1(x)
         x = self.layer3(x)
         x = self.layer4(x)
+        x = self.dropout2(x)
 
         return x
 

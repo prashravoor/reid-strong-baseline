@@ -12,7 +12,7 @@ from .samplers import RandomIdentitySampler, RandomIdentitySampler_alignedreid  
 from .transforms import build_transforms
 
 
-def make_data_loader(cfg):
+def make_data_loader(cfg, logger):
     train_transforms = build_transforms(cfg, is_train=True)
     val_transforms = build_transforms(cfg, is_train=False)
     num_workers = cfg.DATALOADER.NUM_WORKERS
@@ -21,6 +21,19 @@ def make_data_loader(cfg):
     else:
         # TODO: add multi dataset to train
         dataset = init_dataset(cfg.DATASETS.NAMES, root=cfg.DATASETS.ROOT_DIR)
+
+    num_train_pids, num_train_imgs, num_train_cams = dataset.get_imagedata_info(dataset.train)
+    num_query_pids, num_query_imgs, num_query_cams = dataset.get_imagedata_info(dataset.query)
+    num_gallery_pids, num_gallery_imgs, num_gallery_cams = dataset.get_imagedata_info(dataset.gallery)
+
+    logger.info("Dataset statistics:")
+    logger.info("  ----------------------------------------")
+    logger.info("  subset   | # ids | # images | # cameras")
+    logger.info("  ----------------------------------------")
+    logger.info("  train    | {:5d} | {:8d} | {:9d}".format(num_train_pids, num_train_imgs, num_train_cams))
+    logger.info("  query    | {:5d} | {:8d} | {:9d}".format(num_query_pids, num_query_imgs, num_query_cams))
+    logger.info("  gallery  | {:5d} | {:8d} | {:9d}".format(num_gallery_pids, num_gallery_imgs, num_gallery_cams))
+    logger.info("  ----------------------------------------")
 
     num_classes = dataset.num_train_pids
     train_set = ImageDataset(dataset.train, train_transforms)
