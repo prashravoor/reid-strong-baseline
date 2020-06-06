@@ -8,16 +8,15 @@ from .bases import BaseImageDataset
 
 class Jaguar(BaseImageDataset):
     """
-       VeRi-776
-       Reference:
-       Liu, Xinchen, et al. "Large-scale vehicle re-identification in urban surveillance videos." ICME 2016.
-
-       URL:https://vehiclereid.github.io/VeRi/
+       Jaguars Dataset
+       Obtained on request.
 
        Dataset statistics:
-       # identities: 776
-       # images: 37778 (train) + 1678 (query) + 11579 (gallery)
-       # cameras: 20
+       # 20% of the ids and corresponding images are used for the test set
+
+       # identities:
+       # images: 880 (train) + 26 (query) + 53 (gallery)
+       # cameras: 1
        """
 
     dataset_dir = 'jaguar'
