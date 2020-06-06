@@ -49,8 +49,6 @@ def copyPartition(base, outfolder, split):
         print('Copied {} files into {} set'.format(counter, outfolder))
 
     copyFilesFromSplit(identities, train_pids, num_cams, imagesfolder, trainf)
-    #copyFilesFromSplit(identities, query_pids, num_cams, imagesfolder, queryf)
-    #copyFilesFromSplit(identities, gallery_pids, num_cams, imagesfolder, galf)
 
     # For query and gallery set, split them 30% to query and rest to gallery
     assert sorted(query_pids) == sorted(gallery_pids) # Closed set

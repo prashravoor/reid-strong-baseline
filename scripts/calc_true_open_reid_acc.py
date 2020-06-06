@@ -90,16 +90,7 @@ def getRandomClosedReidSplits(img_folder):
     num_ids = len(rev_map)
 
     for k,v in rev_map.items():
-        # For each remaining identity, one is moved to qry, and rest to identity
-        #qry = np.random.choice(v, 1)[0]
-        #x_qry_names.append(qry)
-        #y_qry.append(mapping[qry])
-
-        #gal = [x for x in v if not x == qry]
-        #ids = [mapping[x] for x in gal]
-        #x_gal_names.extend(gal)
-        #y_gal.extend(ids)
-        
+        # For each remaining identity, 25% is moved to qry, and rest to identity
         n = int(np.ceil(len(v) * .25))
         qry = np.random.choice(v, n)
         x_qry_names.extend(qry)
@@ -189,10 +180,6 @@ def getRandomOpenReidSplits(img_folder):
     openids = np.random.choice(list(rev_map.keys()), num_openids, replace=False)
 
     for id in openids:
-        #file = np.random.choice(rev_map[id], 1)[0]
-        #ids = mapping[file]
-        #x_qry_names.append(file)
-        #y_qry.append(ids)
         num = int(np.ceil(0.25 * len(rev_map[id])))
         use = np.random.choice(rev_map[id], num, replace=False)
         ids = [mapping[x] for x in use]
@@ -202,20 +189,15 @@ def getRandomOpenReidSplits(img_folder):
     print('{} Identities used for open set, total {} images'.format(num_openids, len(x_qry_names)))
 
     for k,v in rev_map.items():
-        # For each remaining identity, one is moved to qry, and rest to gallery
+        # For each remaining identity, 25% is moved to qry, and rest to gallery
         if k in openids:
             continue
-        #qry = np.random.choice(v, 1)[0]
-        #x_qry_names.append(qry)
-        #y_qry.append(mapping[qry])
         
         num = int(np.ceil(0.25 * len(v)))
         qry = np.random.choice(v, num, replace=False)
         x_qry_names.extend(qry)
         y_qry.extend([mapping[x] for x in qry])
-        
-        
-        #gal = [x for x in v if not x == qry]
+
         gal = [x for x in v if not x in qry]
         ids = [mapping[x] for x in gal]
         x_gal_names.extend(gal)
@@ -364,7 +346,6 @@ if __name__ == '__main__':
     x_train_gal, x_train_qry = extractFeatures(x_train_gal_names, x_train_qry_names, model)
     distmat_train = pdist(x_train_qry, x_train_gal)
     mean, std = getMeanAndStd(distmat_train)
-    #mean, std = 36.8259, 5.4687
     threshold_dist = mean + (2 * std)
     print('After loading Training Images, Mean distance is: {:.4f}, Standard deviation: {:.4f}, Threshold Distance for Open Re-Id: {:.4f}'.format(mean, std, threshold_dist))
 

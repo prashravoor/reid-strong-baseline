@@ -56,16 +56,7 @@ def getRandomClosedReidSplits(img_folder):
     num_ids = len(rev_map)
 
     for k,v in rev_map.items():
-        # For each remaining identity, one is moved to qry, and rest to identity
-        #qry = np.random.choice(v, 1)[0]
-        #x_qry_names.append(qry)
-        #y_qry.append(mapping[qry])
-        #gal = [x for x in v if not x == qry]
-        
-        #ids = [mapping[x] for x in gal]
-        #x_gal_names.extend(gal)
-        #y_gal.extend(ids)
-        
+        # For each remaining identity, 25% is moved to qry, and rest to identity
         n = int(np.ceil(len(v) * .25))
         qry = np.random.choice(v, n)
         x_qry_names.extend(qry)
