@@ -189,20 +189,31 @@ A copy of the trained models can be obtained from this [Google Drive Link](https
 | **FaceScrub** | 44.12 | 80.95 ± 0.21 | 90.18 ± 0.32 | 92.87 ± 0.59 | 95.10 ± 0.74 |
 | **Chimp** | 59.37 | 87.03 ± 2.64 | 95.18 ± 0.26 | 97.75 ± 0.79 | 99.25 ± 0.84 |
 
-## Cumulative Matching Characterisitc (CMC) Curve
+## Qualitative Results (using ResNet50 model)
 
+### Cumulative Matching Characterisitc (CMC) Curve for ResNet50 model over the validation set
 ![CMC Curve](imgs/cmc.jpg "CMC Curve for ResNet50 model over the validation set")
 
-## Qualitative Results (using ResNet50 model)
+### Tigers - Closed Set Re-Identification Results
 
 ![Tigers - Closed Set Re-identification](imgs/tiger_closed.png?raw=true "Tigers - Closed Set Re-Identification Results")
 
+### Jaguars - Closed Set Re-Identification Results
+
 ![Jaguars - Closed Set Re-identification](imgs/jaguar_closed.png?raw=true "Jaguars - Closed Set Re-Identification Results")
+
+### Elephants - Closed Set Re-Identification Results
 
 ![Elephants - Closed Set Re-identification](imgs/elephant_closed.png?raw=true "Elephants - Closed Set Re-Identification Results")
 
+### Chimpanzee - Closed Set Re-Identification Results
+
 ![Chimpanzee - Closed Set Re-identification](imgs/chimp_closed.png?raw=true "Chimpanzee - Closed Set Re-Identification Results")
 
+### FaceScrub - Closed Set Re-Identification Results
+
 ![FaceScrub - Closed Set Re-identification](imgs/facescrub_closed.png?raw=true "FaceScrub - Closed Set Re-Identification Results")
+
+### Tigers - Open Set Re-Identification Results
 
 ![Tigers - Open Set Re-identification](imgs/tiger_open.jpg?raw=true "Tigers - Open Set Re-Identification Results")
